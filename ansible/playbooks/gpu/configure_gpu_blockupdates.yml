@@ -1,0 +1,17 @@
+- name: Block automatic updates
+  dpkg_selections:
+    name: "{{ item }}"
+    selection: hold
+  loop:
+    - nvidia-driver-440
+    - nvidia-driver-450
+    - nvidia-utils-470
+    - xserver-xorg-video-nvidia-470
+  become: yes
+
+- name: Regex block nvidia driver auto-update
+  become: yes
+  lineinfile:
+    path: /etc/apt/apt.conf.d/50unattended-upgrades
+    line: '    "nvidia-";'
+    insertafter: .*Unattended-Upgrade::Package-Blacklist.*

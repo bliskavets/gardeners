@@ -1,0 +1,55 @@
+- name: Set allowed_users to anybody in /etc/X11/Xwrapper.config
+  lineinfile:
+    path: /etc/X11/Xwrapper.config
+    regexp: '^allowed_users='
+    line: 'allowed_users=anybody'
+    create: yes
+
+- name: Copy systemd service file to server
+  copy:
+    src: scripts/x11.service
+    dest: /etc/systemd/system
+    mode: 0644
+    owner: root
+    group: root
+
+- name: Copy script
+  copy:
+    src: scripts/x11-configure.bash
+    mode: 0755
+    dest: /usr/local/bin
+    owner: root
+    group: root
+
+#############
+# due to a known issue with the systemd module where it incorrectly reports a change if the service has an alias.
+#
+- name: Start X11 Service
+  systemd:
+    name: x11
+    state: started
+    enabled: yes
+
+#############
+- name: Check if X11-config exists
+  stat:
+    path: /etc/X11/xorg.conf
+  register: x11_config
+
+- name: Create X11-config
+  command: nvidia-xconfig
+  when: not x11_config.stat.exists
+  register: x11_config_changed
+  changed_when: x11_config_changed.rc == 0
+
+- name: Add custom config for prevent X11 from sleeping
+  blockinfile:
+    path: /etc/X11/xorg.conf
+    backup: yes
+    block: |
+      Section "Serverflags"
+          Option "BlankTime" "0"
+          Option "StandbyTime" "0"
+          Option "SuspendTime" "0"
+          Option "OffTime" "0"
+      EndSection

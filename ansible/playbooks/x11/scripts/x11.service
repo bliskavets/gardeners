@@ -1,0 +1,9 @@
+[Unit]
+After=network.service
+
+[Service]
+KillMode=none
+ExecStart=/usr/local/bin/x11-configure.bash
+
+[Install]
+WantedBy=default.target

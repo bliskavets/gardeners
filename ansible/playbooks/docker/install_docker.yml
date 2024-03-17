@@ -1,0 +1,55 @@
+- name: Install a few prerequisite packages
+  apt:
+    update_cache: yes
+    name:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - software-properties-common
+
+- name: Add GPG key for the official Docker repository
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
+
+- name: Add the Docker repository to APT sources
+  apt_repository:
+    repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release }} stable"
+    state: present
+  become: yes
+
+- name: Make sure you are about to install from the Docker repo instead of the default Ubuntu repo
+  command: apt-cache policy docker-ce
+  register: temp_result
+  failed_when: temp_result.rc != 0
+  changed_when: False
+
+- name: Set package version for Ubuntu 20.04 (Focal)
+  set_fact:
+    docker_ce_version: "5:25.0.3-1~ubuntu.20.04~focal"
+    docker_compose_plugin_version: "2.24.5-1~ubuntu.20.04~focal"
+    docker_ce_cli_version: "5:25.0.3-1~ubuntu.20.04~focal"
+  when: ansible_distribution_release == 'focal'
+
+- name: Set package version for Ubuntu 22.04 (Jammy)
+  set_fact:
+    docker_ce_version: "5:25.0.3-1~ubuntu.22.04~jammy"
+    docker_compose_plugin_version: "2.24.5-1~ubuntu.22.04~jammy"
+    docker_ce_cli_version: "5:25.0.3-1~ubuntu.22.04~jammy"
+  when: ansible_distribution_release == 'jammy'
+
+- name: Install Docker and related packages
+  apt:
+    update_cache: yes
+    name:
+      - "docker-ce={{ docker_ce_version }}"
+      - "docker-compose-plugin={{ docker_compose_plugin_version }}"
+      - "docker-ce-cli={{ docker_ce_cli_version }}"
+      - pigz
+- name: Add ubuntu user to docker group
+  user:
+    name: "{{ item }}"
+    groups: docker
+    append: yes
+  loop:
+  - ubuntu

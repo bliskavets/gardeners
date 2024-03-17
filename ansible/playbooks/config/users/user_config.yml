@@ -1,0 +1,52 @@
+- name: Disable root login
+  user:
+    name: root
+    password_lock: true
+- name: Install passlib
+  remote_user: ubuntu
+  become_user: ubuntu
+  environment:
+    HOME: /home/ubuntu
+  args:
+    executable: /bin/bash
+  shell:
+    cmd: | # Note: Didnt get it to work on all machines if I dont use the explicit full pyenv path... :(
+      /home/ubuntu/.pyenv/shims/pip install passlib
+- name: Generate hashed password for /etc/shadow
+  remote_user: ubuntu
+  become_user: ubuntu
+  environment:
+    HOME: /home/ubuntu
+  args:
+    executable: /bin/bash
+  shell:
+    cmd: | # Note: Didnt get it to work on all machines if I dont use the explicit full pyenv path... :(
+      /home/ubuntu/.pyenv/shims/python3 -c "from passlib.hash import sha512_crypt; import getpass; print(sha512_crypt.using(rounds=5000).hash('{{become_pass}}'))"
+  register: hashed_become_pass
+- name: Ensure 'ubuntu' group exists
+  group:
+    name: ubuntu
+    state: present
+  become: true
+
+- name: Ensure 'ubuntu' user is in 'ubuntu' group
+  user:
+    name: ubuntu
+    groups: ubuntu
+    append: yes
+  become: true
+- name: Change ubuntu user password to "{{become_pass}}" - hashed "{{hashed_become_pass.stdout}}"
+  user:
+    name: ubuntu
+    comment: ubuntu account
+    shell: /bin/bash
+    password: "{{ hashed_become_pass.stdout }}"
+    groups: ubuntu,adm,cdrom,sudo,dip,plugdev,lxd,docker
+    append: yes
+- name: Allow 'ubuntu' group to only have password sudo
+  lineinfile:
+    dest: /etc/sudoers.d/90-cloud-init-users
+    state: present
+    regexp: '^ubuntu.*'
+    line: 'ubuntu ALL=(ALL) ALL'
+  become: true

@@ -1,0 +1,61 @@
+- name: Add the NVIDIA GPG key to the system keyring
+  become: yes
+  ansible.builtin.apt_key:
+    url: https://nvidia.github.io/libnvidia-container/gpgkey
+    keyring: /usr/share/keyrings/nvidia-container-toolkit-keyring.gpg
+    state: present
+
+- name: Download NVIDIA container toolkit apt source list
+  become: yes
+  ansible.builtin.get_url:
+    url: https://nvidia.github.io/libnvidia-container/stable/deb/nvidia-container-toolkit.list
+    dest: /tmp/nvidia-container-toolkit.list
+
+- name: Find/Replace in NVidia source list
+  become: yes
+  ansible.builtin.replace:
+    path: /tmp/nvidia-container-toolkit.list
+    regexp: "deb https://"
+    replace: "deb [signed-by=/usr/share/keyrings/nvidia-container-toolkit-keyring.gpg] https://"
+
+
+- name: Copy the modified NVIDIA source list to sources.list.d
+  become: yes
+  ansible.builtin.copy:
+    src: /tmp/nvidia-container-toolkit.list
+    dest: /etc/apt/sources.list.d/nvidia-container-toolkit.list
+    mode: '0644'
+    remote_src: yes
+
+- name: Install NVidia Container Toolkit
+  become: yes
+  ansible.builtin.apt:
+    name: nvidia-container-toolkit=1.14.6-1
+    update_cache: yes
+    state: present
+
+- name: Configure Docker runtime with Nvidia Container Toolkit
+  become: yes
+  command: nvidia-ctk runtime configure --runtime=docker
+  register: nvidia_ctk_configured
+
+- name: Display /etc/docker/daemon.json contents (After configuration)
+  become: yes
+  ansible.builtin.slurp:
+    src: /etc/docker/daemon.json
+  register: docker_daemon_after
+  when: nvidia_ctk_configured.changed
+  failed_when: false
+
+- name: Debug print /etc/docker/daemon.json (After configuration)
+  become: yes
+  ansible.builtin.debug:
+    msg: "{{ docker_daemon_after['content'] | b64decode }}"
+  when: docker_daemon_after.content is defined
+
+- name: Restart Docker service
+  become: yes
+  ansible.builtin.systemd:
+    name: docker
+    state: restarted
+  when: nvidia_ctk_configured.changed

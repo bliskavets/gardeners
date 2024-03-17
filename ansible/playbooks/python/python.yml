@@ -1,0 +1,5 @@
+- name: Install python-is-python3
+  apt:
+    update_cache: yes
+    name:
+      - python-is-python3

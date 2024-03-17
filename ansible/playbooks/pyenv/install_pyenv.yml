@@ -1,0 +1,82 @@
+
+- name: Pyenv - Apt Install suggested requirements
+  apt:
+    update_cache: yes
+    name:
+      - python3-pip
+      - make
+      - build-essential
+      - libssl-dev
+      - zlib1g-dev
+      - libbz2-dev
+      - libreadline-dev
+      - libsqlite3-dev
+      - wget
+      - curl
+      - llvm
+      - libncursesw5-dev
+      - xz-utils
+      - tk-dev
+      - libxml2-dev
+      - libxmlsec1-dev
+      - libffi-dev
+      - liblzma-dev
+- name: Check if pyenv is installed
+  stat:
+    path: /home/ubuntu/.pyenv
+  register: pyenv_installed
+
+- name: Clone pyenv repository
+  git:
+    repo: https://github.com/pyenv/pyenv.git
+    dest: /home/ubuntu/.pyenv
+    version: v2.3.25
+  become: yes
+  become_user: ubuntu
+  when: not pyenv_installed.stat.exists
+
+- name: Run pyenv installer
+  command:
+    cmd: bash /home/ubuntu/.pyenv/plugins/python-build/install.sh
+  become: yes
+  become_user: root
+  when: not pyenv_installed.stat.exists
+
+- name: Add necessary pyenv loads to .bashrc of user ubuntu
+  remote_user: ubuntu
+  blockinfile:
+    dest: /home/ubuntu/.bashrc
+    backup: no
+    block: |
+      export PYENV_ROOT="$HOME/.pyenv"
+      command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"
+      eval "$(pyenv init -)"
+- name: Check if Python 3.10.8 is installed
+  shell: /home/ubuntu/.pyenv/bin/pyenv versions | grep 3.10.8
+  register: python_installed
+  ignore_errors: true
+  changed_when: false
+  remote_user: ubuntu
+  become_user: ubuntu
+
+- name: Install default version of python via pyenv - 3.10.8
+  remote_user: ubuntu
+  become_user: ubuntu
+  environment:
+    HOME: /home/ubuntu
+  args:
+    executable: /bin/bash
+  shell: |
+    source /home/ubuntu/.bashrc && /home/ubuntu/.pyenv/bin/pyenv install 3.10.8 -s
+  when: python_installed.rc != 0
+
+- name: Set default global version of python via pyenv - 3.10.8
+  remote_user: ubuntu
+  become_user: ubuntu
+  environment:
+    HOME: /home/ubuntu
+  args:
+    executable: /bin/bash
+  shell: |
+    source /home/ubuntu/.bashrc && /home/ubuntu/.pyenv/bin/pyenv global 3.10.8
+  when: python_installed.rc != 0
