@@ -1,10 +1,32 @@
-import { Box, Text } from '@chakra-ui/react';
-import { memo } from "react";
+import { Box, Center, Heading, Text } from "@chakra-ui/react";
+import { memo, useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
+import { apiFetch } from "../api";
 
 const DemoPage = () => {
+  const [item, setItem] = useState(null);
+  const [searchParams] = useSearchParams()
+  const q = searchParams.get('q')
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const data = await apiFetch({
+          path: `items/1?q=${q}`,
+        });
+        setItem(data);
+      } catch (error) {
+        console.error("Fetching error:", error);
+      }
+    };
+
+    fetchData();
+  }, [q]);
+
   return (
-    <Box p={4}>
-      <Text fontSize="xl">Hello World!!!</Text>
+    <Box>
+      <Heading>Hello World!</Heading>
+      <Text>Api call response: {JSON.stringify(item)}</Text>
     </Box>
   );
 };
