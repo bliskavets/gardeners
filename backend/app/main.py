@@ -26,5 +26,5 @@ def read_root():
 
 
 @app.post("/ask")
-def read_item(req: Request):
+def ask_question(req: Request):
     return {"response": chatgpt.get_completion_text(req.prompt)}
