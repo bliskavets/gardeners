@@ -4,6 +4,8 @@
   gather_facts: True
 
   tasks:
+
+    - include_tasks: config/hostname/config.yml
     - include_tasks: jq/configure_jq.yml
     
     - include_tasks: pyenv/install_pyenv.yml
@@ -37,7 +39,7 @@
     - include_tasks: x11/x11_configure.yml
       when: tags is search("GPU")
 
-    - include_tasks: docker/configure_docker_daemon.yml      
+    - include_tasks: docker/configure_docker_daemon.yml 
 
     - include_tasks: config/ssh/configure_ssh.yml
 

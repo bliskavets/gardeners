@@ -1,9 +1,9 @@
-import { Box, Center, Heading, Text } from "@chakra-ui/react";
+import { Box, Heading, Text } from "@chakra-ui/react";
 import { memo, useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { apiFetch } from "../api";
 
-const DemoPage = () => {
+const HelloWorldPage = () => {
   const [item, setItem] = useState(null);
   const [searchParams] = useSearchParams()
   const q = searchParams.get('q')
@@ -12,7 +12,7 @@ const DemoPage = () => {
     const fetchData = async () => {
       try {
         const data = await apiFetch({
-          path: `items/1?q=${q}`,
+          path: `/?q=${q}`,
         });
         setItem(data);
       } catch (error) {
@@ -31,4 +31,4 @@ const DemoPage = () => {
   );
 };
 
-export default memo(DemoPage);
+export default memo(HelloWorldPage);

@@ -9,7 +9,8 @@
       {
         "default-address-pools": [
           {"base": "172.17.0.0/16", "size": 24}
-        ]
+        ],
+        "data-root": "/docker"
       }
     dest: /etc/docker/daemon.json
     owner: root
@@ -18,8 +19,3 @@
 
 - name: Restart docker
   shell: systemctl restart docker
-
-# Comments:
-# - For BIP: We explicitly specify the otherwise seemingly random chosen bridge network IP range to avoid overlap in-house with the ns1.speag.com DNS server IP 172.16.8.15
-# - Note as well that this applies: https://github.com/moby/moby/issues/22638#issuecomment-263932574
-# - DONT USE RANGE {"base":"172.22.0.0/14","size":14}, This is used in the simcore_interactive_services_subnet

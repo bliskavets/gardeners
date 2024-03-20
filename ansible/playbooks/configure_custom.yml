@@ -2,5 +2,5 @@
   gather_facts: True
 
   tasks:
-  - import_tasks: docker/configure_docker_labels.yml
-    when: tags is search("LEADER") and tags is not search("NOSWARM")
+  # - include_tasks: docker/configure_docker_daemon.yml
+  - include_tasks: gpu/configure_gpu.yml
