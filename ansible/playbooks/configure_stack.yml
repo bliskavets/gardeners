@@ -4,43 +4,27 @@
   gather_facts: True
 
   tasks:
-
     - include_tasks: config/hostname/config.yml
     - include_tasks: jq/configure_jq.yml
-    
     - include_tasks: pyenv/install_pyenv.yml
-
     - include_tasks: config/docker-folder/dedicated-hd-config.yml
       when: tags is not search("NODEDICATEDHD")
-
     - include_tasks: config/docker-folder/simple-config.yml
       when: tags is search("NODEDICATEDHD")
-
     - include_tasks: docker/install_docker.yml
-
+    - include_tasks: docker/configure_docker_daemon.yml
     - include_tasks: git/configure_git.yml
-      
     - include_tasks: make/configure_make.yml
-      
     - include_tasks: unzip/configure_unzip.yml
-      
     - include_tasks: gpu/configure_gpu.yml
       when: tags is search("GPU")
-    
     - include_tasks: gpu/install_nvidia440.yml
       when: tags is search("GPU")
-  
     - include_tasks: gpu/install_nvidia_ctk.yml
       when: tags is search("GPU")
-
     - include_tasks: gpu/configure_gpu_blockupdates.yml
       when: tags is search("GPU")
-
     - include_tasks: x11/x11_configure.yml
       when: tags is search("GPU")
-
-    - include_tasks: docker/configure_docker_daemon.yml 
-
     - include_tasks: config/ssh/configure_ssh.yml
-
     - include_tasks: config/users/user_config.yml # Last step
