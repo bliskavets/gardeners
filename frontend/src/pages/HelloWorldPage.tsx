@@ -6,13 +6,16 @@ import { apiFetch } from "../api";
 const HelloWorldPage = () => {
   const [item, setItem] = useState(null);
   const [searchParams] = useSearchParams()
-  const q = searchParams.get('q')
+  const q = searchParams.get('q') ?? undefined
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const data = await apiFetch({
-          path: `/?q=${q}`,
+          path: ``,
+          queryParams: {
+            "q": q 
+          }
         });
         setItem(data);
       } catch (error) {
