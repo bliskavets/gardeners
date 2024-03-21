@@ -1,0 +1,4 @@
+streamlit==1.32.2
+geemap==0.32.0
+PyCRS==1.0.2
+streamlit-folium==v0.18.0
