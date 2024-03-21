@@ -11,4 +11,4 @@ COPY ./assets /content
 
 EXPOSE 5000
 
-CMD ["streamlit", "run", "--server.port", "5000", "app/home_page.py"]
+CMD ["streamlit", "run", "--server.port", "5000", "app/insights.py"]

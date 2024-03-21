@@ -163,25 +163,21 @@ def show_tree_map():
         Map.addLayer(lc_image, igbpLandCoverVis,
                      f'MODIS Land Cover {years[i]}')
 
-    legend_keys = ['Evergreen Needleleaf Forests', 'Evergreen Broadleaf Forests', 'Deciduous Needleleaf Forests', 'Deciduous Broadleaf Forests',
-                   'Mixed Forests', 'Closed Shrublands', 'Open Shrublands', 'Woody Savannas',
-                   'Savannas', 'Grasslands', 'Permanent Wetlands', 'Croplands', 'Urban and Built-up',
-                   'Cropland/Natural Vegetation Mosaics', 'Permanent Snow and Ice', 'Barren', 'Water Bodies']
 
-    igbpLandCoverVisu = ['05450a', '086a10', '54a708', '78d203', '009900', 'c6b044',
-                         'dcd159', 'dade48', 'fbff13', 'b6ff05', '27ff87', 'c24f44',
-                         'a5a5a5', 'ff6d4c', '69fff8', 'f9ffa4', '1c0dff']
 
-    Map.add_legend(labels=legend_keys, colors=igbpLandCoverVisu,
-                   position='bottomleft', draggable=True)
-    Map.addLayerControl()
+    Map.add_legend(
+        title="Land cover",
+        builtin_legend='MODIS/006/MCD12Q1',
+        position='bottomright',
+        draggable=True
+    )
 
     Map.to_streamlit(height=600)
 
 
 @st.cache_data
 def show_side_by_side_tree_lc_map():
-    Map = geemap.Map(center=[-9, -51], zoom=10)
+    Map = geemap.Map(center=[-9, -51], zoom=7)
 
     left_layer = geemap.ee_tile_layer(brazil_lc03, igbpLandCoverVis, "MODIS")
     right_layer = geemap.ee_tile_layer(brazil_lc20, igbpLandCoverVis, "MODIS")

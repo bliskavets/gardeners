@@ -123,11 +123,11 @@ def show_satellite_tab():
 
 
 def main():
-    st.markdown("# Detect wildfire realtime")
-    st.sidebar.markdown("# Detect wildfire realtime")
+    st.markdown("# Monitoring wildfire realtime")
+    st.sidebar.markdown("# Land degradation in Brazil")
 
     satellite_tab, drone_tab = st.tabs(
-        ['Satellite view', 'Drone view']
+        ['step 1: satellite detection', 'step 2: drone validation']
     )
 
     with satellite_tab:
