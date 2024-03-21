@@ -7,6 +7,17 @@ import folium
 ee.Authenticate()
 ee.Initialize(project='gardeners-417908')
 
+custom_css = """
+    <style>
+        [data-testid="stSidebarNavLink"] {
+            font-size: 25px;
+        }
+    </style>
+"""
+
+# Inject custom CSS with st.markdown
+st.markdown(custom_css, unsafe_allow_html=True)
+
 brazil_shapefile = geemap.shp_to_ee('/content/Brazil.shp')
 drone_locations = [
     {"name": "drone 1", "lat": -15, "lon": -56,
@@ -18,8 +29,8 @@ drone_locations = [
 ]
 
 satellite_hotspots = [
-    {'lat': d['lat'] - 1 if ix % 2 == 0 else d['lat'] + 1,
-     'lon': d['lon'] - 1 if ix % 2 == 0 else d['lon'] + 1,
+    {'lat': d['lat'] - 2 if ix % 2 == 0 else d['lat'] + 2,
+     'lon': d['lon'] - 2 if ix % 2 == 0 else d['lon'] + 2,
      'prob': 15 * ix,
         'name': f'Hotspot {ix}', 'image_url': f"/content/space_view_{ix}.jpg"
      }
@@ -28,6 +39,9 @@ satellite_hotspots = [
 
 
 def show_drone_map():
+
+
+
     with st.spinner():
         # Create a Folium map centered around Brazil
         Map = geemap.Map(center=[-10, -55], zoom=4)

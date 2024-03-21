@@ -5,6 +5,18 @@ from maps import show_side_by_side_tree_lc_map
 
 
 def main():
+
+    custom_css = """
+        <style>
+            [data-testid="stSidebarNavLink"] {
+                font-size: 25px;
+            }
+        </style>
+    """
+
+    # Inject custom CSS with st.markdown
+    st.markdown(custom_css, unsafe_allow_html=True)
+
     st.markdown("# 360 interactive insights")
 
     st.sidebar.markdown("# Land degradation in Brazil")
