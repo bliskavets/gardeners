@@ -10,15 +10,24 @@ ee.Initialize(project='gardeners-417908')
 brazil_shapefile = geemap.shp_to_ee('/content/Brazil.shp')
 drone_locations = [
     {"name": "drone 1", "lat": -15, "lon": -56,
-        "video_url": "/content/sample-video.mp4"},
+     "video_url": "/content/sample-video.mp4"},
     {"name": "drone 2", "lat": -29, "lon": -50,
-        "video_url": "/content/sample-video.mp4"},
+     "video_url": "/content/sample-video.mp4"},
     {"name": "drone 3", "lat": -10, "lon": -45,
      "video_url": "/content/sample-video.mp4"}
 ]
 
+satellite_hotspots = [
+    {'lat': d['lat'] - 1 if ix % 2 == 0 else d['lat'] + 1,
+     'lon': d['lon'] - 1 if ix % 2 == 0 else d['lon'] + 1,
+     'prob': 15 * ix,
+        'name': f'Hotspot {ix}', 'image_url': f"/content/space_view_{ix}.jpg"
+     }
+    for ix, d in enumerate(drone_locations, 1)
+]
 
-def show_map():
+
+def show_drone_map():
     with st.spinner():
         # Create a Folium map centered around Brazil
         Map = geemap.Map(center=[-10, -55], zoom=4)
@@ -34,6 +43,17 @@ def show_map():
                 )
             )
 
+        for hotspot in satellite_hotspots:
+            icon = folium.CustomIcon(
+                icon_image='/content/red_rect.png',  # Specify the path to your custom icon image
+                icon_size=(35, 35)  # Adjust the size of the icon as needed
+            )
+            marker = folium.Marker(
+                location=[hotspot["lat"], hotspot["lon"]],
+                icon=icon,
+            )
+            Map.add_child(marker)
+
         # Add the Brazil shapefile to the map
         Map.addLayer(brazil_shapefile, {}, "Brazil", opacity=0.5)
 
@@ -41,13 +61,8 @@ def show_map():
         Map.to_streamlit(height=600)
 
 
-def main():
-    st.markdown("# Detect wildfire realtime")
-    st.sidebar.markdown("# Detect wildfire realtime")
-
-    show_map()
-
-    # Add clickable markers for each drone
+def show_drone_tab():
+    show_drone_map()
 
     # Create a select box for choosing a drone
     drone_names = [drone["name"] for drone in drone_locations]
@@ -62,6 +77,64 @@ def main():
 
     if selected_drone:
         st.video(selected_drone["video_url"])
+
+
+@st.cache_data
+def show_satellite_map():
+    Map = Map = geemap.Map(center=[-10, -55], zoom=3)
+
+    Map.add_basemap('HYBRID')
+
+    # Add Brazil's boundaries to the map
+    Map.addLayer(brazil_shapefile, {}, 'Brazil', opacity=0.8)
+
+    for hotspot in satellite_hotspots:
+        icon = folium.CustomIcon(
+            icon_image='/content/red_rect.png',  # Specify the path to your custom icon image
+            icon_size=(15, 15)  # Adjust the size of the icon as needed
+        )
+        marker = folium.Marker(
+            location=[hotspot["lat"], hotspot["lon"]],
+            icon=icon,
+            tooltip=f"{hotspot['name']} (prob {hotspot['prob']}%)",
+        )
+        Map.add_child(marker)
+
+    # Display the map in Streamlit
+    Map.to_streamlit(height=600)
+
+
+def show_satellite_tab():
+    show_satellite_map()
+
+    # Create a select box for choosing a drone
+    hostpot_names = [hs["name"] for hs in satellite_hotspots]
+    selected_hs_name = st.selectbox(
+        "Select a hotspot to view:", options=hostpot_names)
+
+    # Find the selected drone and display its video
+    selected_hs = next(
+        (hs for hs in satellite_hotspots if hs["name"]
+         == selected_hs_name), None
+    )
+
+    if selected_hs:
+        st.image(selected_hs["image_url"])
+
+
+def main():
+    st.markdown("# Detect wildfire realtime")
+    st.sidebar.markdown("# Detect wildfire realtime")
+
+    satellite_tab, drone_tab = st.tabs(
+        ['Satellite view', 'Drone view']
+    )
+
+    with satellite_tab:
+        show_satellite_tab()
+
+    with drone_tab:
+        show_drone_tab()
 
 
 main()
