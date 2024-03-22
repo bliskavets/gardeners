@@ -1,4 +1,4 @@
 # gardeners
 
-### Run ansible to configure machine
-cd ./ansible/playbooks && ./run_ansible.bash
+### Interactive AI-backed platform
+http://3.73.202.51:5000/
