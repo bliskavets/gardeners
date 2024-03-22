@@ -21,6 +21,6 @@ def main():
     st.markdown("# Burned area projection 2050")
     st.sidebar.markdown("# Land degradation in Brazil")
 
-    st.image("/content/burned_area.gif", width=500)
+    st.image("/content/burned_area.gif")
 
 main()
