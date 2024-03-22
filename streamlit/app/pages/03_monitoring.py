@@ -7,6 +7,17 @@ import folium
 ee.Authenticate()
 ee.Initialize(project='gardeners-417908')
 
+custom_css = """
+    <style>
+        [data-testid="stSidebarNavLink"] {
+            font-size: 25px;
+        }
+    </style>
+"""
+
+# Inject custom CSS with st.markdown
+st.markdown(custom_css, unsafe_allow_html=True)
+
 brazil_shapefile = geemap.shp_to_ee('/content/Brazil.shp')
 drone_locations = [
     {"name": "drone 1", "lat": -15, "lon": -56,
