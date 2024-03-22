@@ -21,11 +21,11 @@ st.markdown(custom_css, unsafe_allow_html=True)
 brazil_shapefile = geemap.shp_to_ee('/content/Brazil.shp')
 drone_locations = [
     {"name": "drone 1", "lat": -15, "lon": -56,
-     "video_url": "/content/sample-video.mp4"},
+     "video_url": "/content/sample-video_0.mp4"},
     {"name": "drone 2", "lat": -29, "lon": -50,
-     "video_url": "/content/sample-video.mp4"},
+     "video_url": "/content/sample-video_1.mp4"},
     {"name": "drone 3", "lat": -10, "lon": -45,
-     "video_url": "/content/sample-video.mp4"}
+     "video_url": "/content/sample-video_2.mp4"}
 ]
 
 satellite_hotspots = [
